@@ -53,9 +53,9 @@ delivered by Phase 4.
 ```
 Phase 1 (Auth + Onboarding)
   └→ Phase 2 (Shopify + Data Pipeline)
-       ├→ Phase 3 (Anomaly Detection + Basic Insights)
-       │    └→ Phase 4 (Dashboard + Notifications)
-       │         └→ Phase 5 (AI Chat + Insights Detail)
+├→ Phase 3 (Anomaly Detection + Insight Delivery)
+        │    └→ Phase 4 (Dashboard + Notifications)
+        │         └→ Phase 5 (AI Chat + Insights Detail)
        │              └→ Phase 6 (Settings + Team Management)
        └→ Phase 7 (Meta + Klaviyo Integrations)
 ```
@@ -66,8 +66,8 @@ Phase 1 (Auth + Onboarding)
 |-------|------|---------|--------------|-------|---------------|--------|
 | 1 | Auth + Onboarding | 1-5 | None | Base — no product without users | User can sign up, connect Shopify | pending |
 | 2 | Shopify + Data Pipeline | 10-12, 17-23 | Phase 1 | Core data flow — enables everything | Shopify data syncs every 6 hours | pending |
-| 3 | Anomaly Detection + Insights | 24-34 | Phase 2 | Core differentiator | System produces structured insights | pending |
-| 4 | Dashboard + Notifications | 35-42, 43-49 | Phase 3 | Aha moment — users see value | Morning Brief + email delivery | pending |
+| 3 | Anomaly Detection + Insight Delivery | 24-34, 35-42 | Phase 2 | Core differentiator — aha moment | User receives AI-produced insight email with root causes and recommendations | pending |
+| 4 | Dashboard + Notifications | 43-49 | Phase 3 | Visual confirmation — users see value in app | Morning Brief + insight history in app | pending |
 | 5 | AI Chat + Insights Detail | 50-54, 58-62 | Phase 4 | Engagement — deeper interaction | Chat responds with data-grounded answers | pending |
 | 6 | Settings + Team Management | 63-68 | Phase 5 | Retention — multi-user support | Team invite + RLS working | pending |
 | 7 | Meta + Klaviyo Integrations | 13-16 | Phase 2 | Depth — multi-source diagnosis | Meta + Klaviyo data flows in | pending |
@@ -142,6 +142,7 @@ Max 300 lines per spec. If it exceeds 300, the phase scope is too broad — subd
 | Generating all phase specs at once | ONE spec at a time, just before execution |
 | Skipping the interview | Always interview — every PRD has assumptions |
 | Horizontal phases (all DB, then all API) | Every phase must be a vertical slice |
+| Phase whose output only the next phase consumes (invisible middleware) | Merge it with the consuming phase. If Phase N produces data that Phase N+1 displays, they belong together |
 | Priority decisions without asking | Business value is the user's call |
 | Reading entire codebase for context | Follow STRICT reading rules (see SKILL.md SPEC MODE step 1) |
 | Inventing features ("best practice says...") | DO NOT add features not in PRD |
@@ -166,6 +167,7 @@ Max 300 lines per spec. If it exceeds 300, the phase scope is too broad — subd
 - Creating a phase with no UI component (not a vertical slice)
 - Adding a feature not mentioned in the PRD or roadmap
 - Reading test files or full component source code for context
+- Done criteria that describe internal system state ("system produces X") rather than user-observable behavior ("user sees/receives X")
 - Making a priority call without asking the user
 - Asking multiple interview questions in one message
 - Proceeding to SPEC MODE before the user approves the roadmap
@@ -225,6 +227,7 @@ Run through this checklist before presenting any output to the user.
 | Check | How to verify |
 |-------|---------------|
 | Every phase is a vertical slice | Each phase includes DB changes + API endpoints + UI screens. Flag any phase with only one layer. |
+| Every phase has user-visible output | For each phase, ask: "Can an end user see or interact with this phase's output without needing Phase N+1?" If not, merge with the consuming phase. Storing computed results a user can't yet see is NOT user-visible. |
 | 3-5 stories per phase | Count user stories. If >5, subdivide. If <2, consider merging with adjacent phase. |
 | Dependencies form a DAG | Walk dependency graph. If any cycle exists (A→B→A), report and propose reordering. |
 | No invented features | Cross-reference every phase feature against the PRD. If a feature has no PRD source, remove it. |
