@@ -144,7 +144,7 @@ Before marking any output complete, run through the [Validation Checklist](REFER
 
 - **ONE spec at a time**, just before execution. Never generate all phases at once.
 - **Always interview.** Every PRD has assumptions. Never skip.
-- **Every phase is a vertical slice.** No pure-backend or pure-UI phases.
+- **Every phase is a vertical slice.** No pure-backend or pure-UI phases. Every phase must pass the "can I verify this without the next phase?" test — if a phase's output is only consumed by a later phase (stored data, queued events, background computations) and no end user can see or interact with it directly, it is NOT a vertical slice. Merge it with its consuming phase.
 - **DO NOT invent features** not in the PRD. DO NOT make priority calls without the user.
 
 **Violating the letter of these rules is violating the spirit of these rules.**
@@ -157,5 +157,6 @@ Before marking any output complete, run through the [Validation Checklist](REFER
 - "Phase 1 is safe to produce" — does NOT replace formal roadmap approval. No spec generation until the roadmap is explicitly approved, even if a phase seems unaffected by pending changes.
 - "Hybrid approach" — is NOT a valid reason to batch interview questions. ONE question per message, always.
 - "Time constraint trade-off" — is NOT a valid reason to batch questions or skip process steps. Speed at the cost of process integrity produces worse outcomes.
+- "This phase stores data the next phase displays" — is NOT a valid vertical slice. If no user can see or interact with a phase's output without the next phase, merge them.
 
 Full list of common mistakes and red flags: see [REFERENCE.md](REFERENCE.md).
