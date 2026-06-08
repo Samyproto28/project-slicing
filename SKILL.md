@@ -81,7 +81,9 @@ If user provides priority input (e.g., "CTO says X in Phase 1"), verify it doesn
 
 **Criteria:** Vertical slices (DB+API+UI) ordered by business value, respecting dependencies. Rules: 3-5 stories per phase (>5: subdivide, <2: merge). Each phase must deliver something functional (no pure-backend or pure-UI phases). Core features before complementary.
 
-**DO NOT:** generate phase specs yet, invent features, create horizontal phases, make priority calls without user.
+**Roadmap content:** Executive summary, dependency graph, phase table (with status column), deferred features, parallelizable phases. Tech stack listed as names only (e.g., "Next.js 14, Supabase, Stripe") — NO schema, NO table mappings, NO implementation details.
+
+**DO NOT:** generate phase specs yet, invent features, create horizontal phases, make priority calls without user, include database schema or table mappings in roadmap.
 
 **Before presenting:** Run through the [Validation Checklist](REFERENCE.md#validation-checklist) (Roadmap section). Fix any failures before showing to user.
 
@@ -118,9 +120,21 @@ User specifies → generate that phase. User says "next phase" → find first `p
 
 Ask: "Anything changed since last phase?" and "Roadmap says Phase N covers X and Y — still accurate?" These two can go in one message. Any additional questions (scope changes, cross-phase drift, ambiguities, feature clarifications) follow the same rule as ROADMAP MODE: **ONE question per message, wait for answer, then next.** A "follow-up" to a base question is still an additional question — it gets its own message. If a `brainstorming` spec exists for this phase, use as base.
 
+**NEVER skip the mini-interview.** Even if the user says "generate directly", "I already confirmed everything", or "the scope is clear" — you MUST ask the two base questions and wait for explicit answers. User impatience does NOT override process integrity.
+
 ### 4. Generate Phase Spec
 
 For each feature: **components** (name + one-line responsibility), **data models** (entities, fields, relationships — NO queries/logic), **API contracts** (method, path, request, response — NO implementation), **user flows**, **acceptance criteria**, **dependencies on previous phases**. Max 300 lines. Format and example: see [REFERENCE.md](REFERENCE.md).
+
+**FORBIDDEN in phase specs** (these belong in `writing-plans`):
+- File paths or directory structures (`src/app/...`, `components/...`)
+- SQL DDL (`CREATE TABLE`, types like `bigint`, `timestamptz`, constraints, indexes)
+- Setup commands (`npm install`, `npx`, `pip install`, etc.)
+- Environment variables (`NEXT_PUBLIC_*`, `SECRET_*`, `*_KEY`)
+- Code of any kind (functions, queries, logic, conditionals)
+- Framework-specific patterns (route groups, middleware config, file naming conventions)
+
+**Allowed in code blocks:** ONLY JSON request/response shapes for API contracts.
 
 DO NOT invent features. If ambiguous, ASK. If codebase contradicts roadmap, REPORT.
 
@@ -146,6 +160,7 @@ Before marking any output complete, run through the [Validation Checklist](REFER
 - **Always interview.** Every PRD has assumptions. Never skip.
 - **Every phase is a vertical slice.** No pure-backend or pure-UI phases. Every phase must pass the "can I verify this without the next phase?" test — if a phase's output is only consumed by a later phase (stored data, queued events, background computations) and no end user can see or interact with it directly, it is NOT a vertical slice. Merge it with its consuming phase.
 - **DO NOT invent features** not in the PRD. DO NOT make priority calls without the user.
+- **Specs define WHAT, not HOW.** No file paths, no SQL DDL, no code, no setup commands, no directory trees, no env vars. If it describes implementation rather than behavior, it belongs in `writing-plans`.
 
 **Violating the letter of these rules is violating the spirit of these rules.**
 
@@ -158,5 +173,9 @@ Before marking any output complete, run through the [Validation Checklist](REFER
 - "Hybrid approach" — is NOT a valid reason to batch interview questions. ONE question per message, always.
 - "Time constraint trade-off" — is NOT a valid reason to batch questions or skip process steps. Speed at the cost of process integrity produces worse outcomes.
 - "This phase stores data the next phase displays" — is NOT a valid vertical slice. If no user can see or interact with a phase's output without the next phase, merge them.
+- "Implementation context helps writing-plans" — does NOT justify including file paths, SQL, or code in specs. writing-plans generates implementation from abstract contracts.
+- "User confirmed the scope" or "generate directly" — does NOT replace the formal mini-interview. Ask the questions explicitly and wait for answers.
+- "Mapping tables in roadmap helps writing-plans" — does NOT justify including schema in roadmap. Roadmap lists tech stack names only. writing-plans reads PRD directly for schema.
+- "Trimming spec content to fit 300 lines" — does NOT replace subdividing the phase. If spec exceeds 300 lines, the phase scope is too broad. Subdivide into two phases.
 
 Full list of common mistakes and red flags: see [REFERENCE.md](REFERENCE.md).

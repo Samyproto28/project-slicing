@@ -121,6 +121,48 @@ Phase 1 (Auth + Onboarding)
 None (base phase)
 ```
 
+## Anti-Example — DO NOT Generate This
+
+The following spec violates project-slicing rules. Every marked item belongs in `writing-plans`:
+
+```markdown
+# ❌ BAD Spec Example
+
+## Components
+- `(auth)/signup/page.tsx` — Formulario de registro ← FILE PATH, not component name
+- `app/api/billing/checkout/route.ts` — Stripe checkout ← FILE PATH
+
+## Data Models
+**`tenants`**
+| Campo | Tipo | ← SQL DDL with specific types
+| `id` | `bigint GENERATED ALWAYS AS IDENTITY` |
+| `plan_tier` | `text CHECK ('starter', 'pro', 'growth')` |
+
+## Setup
+npx create-next-app@latest myapp --typescript ← SETUP COMMAND
+npm install @supabase/supabase-js stripe ← PACKAGE INSTALL
+
+**Directory structure:**
+src/
+  app/
+    (auth)/signup/page.tsx ← DIRECTORY TREE
+```
+
+**✅ CORRECT equivalent:**
+```markdown
+## Components
+- `AuthService` — handles registration, login, OAuth
+- `BillingService` — plan selection and Stripe checkout
+
+## Data Models
+- Tenant { id: bigint, name: string, planTier: enum(starter|pro|growth), subscriptionStatus: enum(trial|active|canceled) }
+
+## Tech Stack
+- Next.js 14 (App Router, TypeScript)
+- Supabase (Auth, Database, RLS)
+- Stripe (Subscriptions, Billing)
+```
+
 ## Spec Format Specification
 
 Phase spec filenames: `YYYY-MM-DD-<project>-phase<N>-<topic>.md`
@@ -132,8 +174,9 @@ Required sections in order:
 4. **User Flows** — numbered steps the user follows
 5. **Acceptance Criteria** — checkbox items, each independently verifiable
 6. **Dependencies on Previous Phases** — specific artifacts used (model names, endpoint paths). Write "None (base phase)" for Phase 1.
+7. **Tech Stack** (optional) — list of technologies for this phase. Helps `writing-plans` know which domain skills to load. Write "N/A" if no specific tech stack.
 
-Max 300 lines per spec. If it exceeds 300, the phase scope is too broad — subdivide and update the roadmap.
+Max 300 lines per spec. If it exceeds 300, the phase scope is too broad — subdivide and update the roadmap. **DO NOT trim content to fit under 300 lines.** If the spec naturally exceeds 300 lines, the phase must be split into two smaller phases, each with its own spec.
 
 ## Common Mistakes
 
@@ -159,6 +202,12 @@ Max 300 lines per spec. If it exceeds 300, the phase scope is too broad — subd
 | Generating Phase 1 spec because it's "safe to produce" without roadmap approval | No spec generation until the roadmap is explicitly approved. Even stable phases must wait. |
 | Using "hybrid approach" to justify batching interview questions | ONE question per message. "Hybrid" is just batching with a nicer name. |
 | Using "time constraint trade-off" to justify batching or skipping steps | Speed at the cost of process integrity produces worse outcomes. ONE question per message, always. |
+| Including file paths and directory structure | Specs use component names, not file paths. `(app)/home/page.tsx` → `HomePage — placeholder for dashboard content` |
+| Including SQL DDL with types and constraints | Specs use abstract types: `Tenant { id: bigint, planTier: enum(...) }` not `CREATE TABLE` with `CHECK` constraints |
+| Including setup commands and env vars | These belong in writing-plans where the tech stack is defined and domain skills are loaded |
+| Adding "Tech Stack" section with implementation details | Tech Stack lists technologies only (Next.js, Supabase, Stripe), not how to configure them |
+| Including schema or table mappings in roadmap | Roadmap lists tech stack names only. writing-plans reads PRD directly for schema details |
+| Trimming spec content to fit under 300 lines | If spec exceeds 300 lines, subdivide the phase. Do not remove content to meet the limit |
 
 ## Red Flags — STOP Immediately If You Catch Yourself
 
@@ -181,6 +230,11 @@ Max 300 lines per spec. If it exceeds 300, the phase scope is too broad — subd
 - Generating a spec because the phase is "safe to produce" without formal roadmap approval
 - Calling batched questions a "hybrid approach" to avoid the one-at-a-time rule
 - Justifying batching as a "time constraint trade-off" — it's still batching
+- Including file paths or directory structures in specs ("this helps writing-plans")
+- Including SQL DDL with types, constraints, or indexes in specs ("implementation context")
+- Including setup commands, env vars, or code in specs ("being thorough")
+- Including schema or table mappings in roadmap ("helps writing-plans know what to create")
+- Trimming spec content to fit under 300 lines instead of subdividing the phase
 
 **All of these mean: Go back. Follow the process.**
 
@@ -214,7 +268,7 @@ When generating a spec for Phase N, the codebase may have diverged from what the
 | No package.json | Glob returns no results | Note tech stack as "unknown". Ask in interview: "What tech stack are you using?" |
 | Circular dependencies | Phase A depends on B, B depends on A | Report to user with graph. Propose: merge phases, extract shared dependency into earlier phase, or break dependency. Do not auto-resolve. |
 | PRD too short (1-2 features) | Count distinct features/user stories | Suggest: "This is small enough for `brainstorming` + `writing-plans` directly. No decomposition needed." |
-| Phase spec exceeds 300 lines | Line count after generation | Subdivide phase into two. Update roadmap with new boundaries and dependencies. Re-generate spec for each sub-phase. |
+| Phase spec exceeds 300 lines | Line count after generation | Subdivide phase into two. Update roadmap with new boundaries and dependencies. Re-generate spec for each sub-phase. **DO NOT trim content to fit under 300.** |
 | Ambiguous PRD section | Multiple valid interpretations | Ask in interview. Never assume. Present options: "The PRD mentions X. Does this mean A or B?" |
 | Codebase contradicts roadmap | Models/endpoints differ from roadmap assumptions | Report discrepancy. Ask: "Roadmap assumes X, but codebase has Y. Which is correct?" |
 
@@ -244,3 +298,9 @@ Run through this checklist before presenting any output to the user.
 | Acceptance criteria verifiable | Each criterion can be tested independently. "System works well" is not valid. "User can login with email/password and receive JWT" is valid. |
 | Dependencies reference specifics | Must name exact models, endpoints, or artifacts from previous phases. "Depends on Phase 1" is not specific enough. |
 | No features beyond roadmap scope | Cross-reference spec features against roadmap phase entry. Flag anything not listed. |
+| No file paths | Scan for `/`, `.tsx`, `.ts`, `.sql`, `src/`, `app/` patterns. Zero file paths allowed. |
+| No SQL DDL | Scan for `CREATE TABLE`, `ALTER`, `GENERATED`, `CHECK`, `CONSTRAINT`. Zero DDL allowed. Abstract types like `bigint` in model definitions are OK. |
+| No code blocks with logic | Only JSON request/response shapes allowed in code blocks. No functions, queries, or conditionals. |
+| No setup commands | Scan for `npm`, `npx`, `pip`, `cargo`, `brew`, etc. Zero setup commands allowed. |
+| No env variables | Scan for `NEXT_PUBLIC_`, `SECRET_`, `_KEY`, `_URL` patterns. Zero env vars allowed. |
+| No directory trees | Scan for tree-like structures (`src/`, `app/`, indented file lists). Zero directory trees allowed. |
