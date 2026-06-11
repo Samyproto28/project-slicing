@@ -217,3 +217,39 @@ Before marking any output complete, run through the [Validation Checklist](REFER
 Full list of common mistakes and red flags: see [REFERENCE.md](REFERENCE.md).
 
 ---
+
+## Testing Mode (AutoResearch)
+
+This skill includes an autonomous testing system inspired by Karpathy's AutoResearch. The agent can iteratively improve SKILL.md by running against pre-interviewed PRD test cases.
+
+**Files:**
+- `SCORE.md` — Quantitative evaluation metrics (read-only for agent)
+- `TEST-MODE.md` — Instructions for autonomous testing loop
+- `tests/prd-*/` — Test cases with PRD, interview decisions, and expected results
+- `docs/decomposition/results.tsv` — Log of testing iterations
+
+**To run testing:**
+```
+Run skill testing
+```
+
+**To run specific test case:**
+```
+Test skill with prd-01-ecommerce
+```
+
+**To run overnight mode (infinite loop):**
+```
+Run skill testing overnight
+```
+
+The testing loop:
+1. Reads test case (PRD + interview decisions)
+2. Generates roadmap and spec (skipping interactive interview)
+3. Evaluates with SCORE.md metrics
+4. Validates against expected.md assertions
+5. If score < threshold: proposes improvement to SKILL.md, re-tests
+6. Logs results to results.tsv
+7. Presents summary with diff of changes
+
+See [TEST-MODE.md](TEST-MODE.md) for full instructions.
