@@ -220,13 +220,3 @@ Full list of common mistakes and red flags: see [REFERENCE.md](REFERENCE.md).
 
 
 
-The testing loop:
-1. Reads test case (PRD + interview decisions)
-2. Generates roadmap and spec (skipping interactive interview)
-3. Evaluates with SCORE.md metrics
-4. Validates against expected.md assertions
-5. If score < threshold: proposes improvement to SKILL.md, re-tests
-6. Logs results to results.tsv
-7. Presents summary with diff of changes
-
-See [TEST-MODE.md](TEST-MODE.md) for full instructions.
